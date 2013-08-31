@@ -10,7 +10,7 @@ class linkedList
     linkedList(); //constructor
     ~linkedList(); //destructor
     void push_back(const T &value);
-    void jeleteNodes(const T &value);
+    void deleteNodes(const T &value);
     void printList();
     void reverseList();
     void deleteList();
