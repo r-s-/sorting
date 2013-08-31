@@ -17,7 +17,6 @@ void deleteList(struct node *first)
     free(first);
     first = tmp;
   }
-  free(tmp);
 }
 
 struct node *deleteNodes (struct node *first, int num)
@@ -26,7 +25,7 @@ struct node *deleteNodes (struct node *first, int num)
   
   if (!first) return NULL;
 
-  while (first && first->val == num)
+  if (first && first->val == num)
   {
     struct node *temp = first;
     first = first->next;
