@@ -8,35 +8,52 @@ struct node
   struct node *next;
 };
 
-struct node *deleteNode(struct node *first, int num)
+void deleteList(struct node *first)
 {
-  struct node *prev=NULL;
-  struct node *root = first;
-  while (root != NULL)
+  struct node *tmp;
+  while (first != NULL)
   {
-    if (root->val == num)
-    {
-      if (prev != NULL && root->next != NULL) //middle elements
-      {
-        prev->next = root -> next;
-        free(root);
-      }
-      else if (prev == NULL) //first element
-      {
-        free(first);
-        first = root->next;
-        root = root->next;
-      }
-      else if (root->next == NULL) //last element
-      {
-        prev->next = NULL;
-        free(root);
-      }
-    }
-    prev = root;
-    root = root -> next;
+    tmp = first->next;
+    free(first);
+    first = tmp;
   }
-  return first;
+  free(tmp);
+}
+
+struct node *deleteNodes (struct node *first, int num)
+{
+  struct node *prev = NULL, *active = NULL;
+  
+  if (!first) return NULL;
+
+  while (first && first->val == num)
+  {
+    struct node *temp = first;
+    first = first->next;
+    free(temp);
+  }
+
+  prev = first;
+  active = first->next;
+
+  while (active)
+  {
+    if (active->val == num)
+    {
+      prev->next = active->next;
+      free(active);
+      active = prev->next;
+    }
+    else
+    {
+      prev = active;
+      active = active ->next;
+    }
+  }
+
+return first;
+  
+
 }
 
 struct node *reverseList(struct node *root)
@@ -56,10 +73,11 @@ struct node *reverseList(struct node *root)
 
 void printList(struct node *root)
 {
- while (root!= NULL)
+  struct node *temp = root;
+ while (temp!= NULL)
  {
-   printf("Value: %d\n", root -> val);
-   root = root -> next;
+   printf("Value: %d\n", temp-> val);
+   temp= temp-> next;
  }
 }
 int main()
@@ -69,7 +87,7 @@ int main()
  int i=1;
  for (;i<=20; ++i)
  {
-     struct node *current = malloc(sizeof(struct node));
+     struct node *current =(struct node*) malloc(sizeof(struct node));
      current -> val = i;
      current -> next = NULL;
      
@@ -80,11 +98,15 @@ int main()
  }
 
  //delete first,last and middle element 
- root = deleteNode(root, 20);
- root = deleteNode(root, 1);
- root = deleteNode(root, 10);
+ root = deleteNodes(root, 20);
+ root = deleteNodes(root, 1);
+ root = deleteNodes(root, 10);
+ //reverse list
  root = reverseList(root);
+ //print list
  printList(root);
 
+ //delete list
+ deleteList(root);
  return 0;
 }
