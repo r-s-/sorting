@@ -7,122 +7,144 @@ template <class T>
 class linkedList
 {
   public:
-    linkedList(); //constructor
     ~linkedList(); //destructor
     void push_back(const T &value);
-    void deleteNodes(const T &value);
-    void printList();
-    void reverseList();
-    void deleteList();
+    void delete_nodes(const T &value);
+    void print_list() const;
+    void reverse_list();
+    void clear();
+    void erase(size_t pos);
   private:
     struct _node
     {
       T val;
-      linkedList *next;
+      _node *next;
     };
-    struct _node node ;
-    linkedList *root = NULL;
-
-  
+    _node *root = NULL;
 };
-template<class T>
-linkedList<T>::linkedList(){};
 
-template<class T>
-linkedList<T>::~linkedList(){};
-
-template<class T>
-void linkedList<T>::deleteList()
+template <class T>
+linkedList<T>::~linkedList<T>()
 {
-  linkedList *t = root;
+  clear();
+}
+
+
+template <class T>
+void linkedList<T>::clear()
+{
+  struct _node *t =NULL;
   while (t)
   {
-    t = root->node.next;
+    t = root->next;
     delete root;
-    root = t;
+    root = t; 
   }
 }
 
-template<class T>
-void linkedList<T>::printList()
-{
-  if(!root) std::cout<<"List is empty"<<std::endl;
-  else
-  {
-    linkedList *t = root;
-    while (t)
-    {
-      std::cout<<t->node.val<<std::endl;
-      t = t->node.next;
-    }
-  }
-
-}
 template <class T>
-void linkedList<T>::reverseList()
+void linkedList<T>::erase(size_t pos)
 {
-
-  linkedList *temp = NULL, *prev = NULL, *current = root;
+  struct _node *current = root;
+  struct _node *prev = NULL;
+  
+  size_t i = 0;
   while (current != NULL)
   {
-    temp = current->node.next;
-    current->node.next = prev;
+    if (pos == i)
+    {
+      struct _node *t = current->next;
+      prev->next = t;
+      delete current;
+    }
+   ++i;
+   prev = current;
+   current=current->next;
+  }
+}
+
+template <class T>
+void linkedList<T>::reverse_list()
+{
+  struct _node *t = NULL, *prev = NULL, *current = root;
+  while (current != NULL)
+  {
+    t = current->next;
+    current->next = prev;
     prev = current;
-    current = temp;
+    current = t;
   }
   root = prev;
 }
-template <class T>
-void linkedList<T>::deleteNodes(const T &value)
-{
-  linkedList *prev = NULL, *active = NULL;
 
-  if(!root) std::cout<<"List is empty"<<std::endl;
-  else
+template <class T>
+void linkedList<T>::delete_nodes(const T &value)
+{
+  struct _node *prev = NULL;
+  struct _node *active = NULL;
+
+  if (root == NULL) return; //list is empty
+  else 
   {
-    if (root&& root->node.val == value)
+    if (root != NULL && root->val == value)
     {
-      linkedList *t = root;
-      root = t->node.next;
+      struct _node *t = root;
+      root = t->next;
       delete t;
     }
-  } 
+  }
+
   prev = root;
-  active = root->node.next;
+  active = root->next;
+
   while (active)
   {
-    if (active->node.val == value)
+    if(active->val == value)
     {
-      prev->node.next = active->node.next;
+      prev->next = active->next;
       delete active;
-      active = prev->node.next;
+      active = prev->next;
     }
     else
     {
       prev = active;
-      active = active->node.next;
+      active = active->next;
     }
   }
 }
-template<class T>
+
+template <class T>
 void linkedList<T>::push_back(const T &value)
 {
-  if (!root)
+
+  if (root == NULL)
   {
-    root = new linkedList<T>();
-    root->node.val = value;
+    root = new _node;
+    root->val = value;
   }
   else
   {
-    linkedList *ptr = root;
-    while (ptr->node.next)
+    struct _node *ptr = root;
+    while (ptr->next != NULL)
     {
-      ptr = ptr->node.next;
+      ptr = ptr->next;
     }
- 
-    ptr->node.next = new linkedList<T>(); 
-    ptr = ptr->node.next;
-    ptr->node.val = value;
+    //now ptr is at the last spot in the list
+    ptr->next = new _node; 
+    ptr = ptr->next;
+    ptr->val = value; 
+    ptr->next = NULL; 
+  }
+}
+
+template <class T>
+void linkedList<T>::print_list() const
+{
+  struct _node *t = root;
+  while (t)
+  {
+    std::cout<<t->val<<std::endl;
+    t = t->next;
   }
 }
 
@@ -133,12 +155,14 @@ int main()
   for (int i = 1; i<=20; i++)
     example.push_back(i);
 
-  example.deleteNodes(20);
-  example.deleteNodes(1);
-  example.deleteNodes(10);
-  example.reverseList();
+  example.delete_nodes(1);
+  example.delete_nodes(10);
+  example.delete_nodes(20);
+  example.erase(2);
 
-  example.printList();
-  example.deleteList();
+  example.reverse_list();
+
+  example.print_list();
+
   return 0;
 }
