@@ -13,13 +13,20 @@ class adj_list
    void add_edge(const T first, const T second);
    void remove_node (const T data); 
    void remove_edge(const T first, const T second);
-   void dfs(const T node, const T lookfor, bool initialize_flag );
+   void dfs(const T node, const T value);
    void bfs();
    void print_list() const;
     
   private:
    std::map<T, std::set<T>> graph;
 
+   //dfs helper functions 
+   void dfsPath(std::stack<T> &path);
+   void findNextNode(T node, T value, std::stack<T> &previousNodes, 
+        std::vector<bool> &discovered);
+   void dfs_recursive(const T node, const T value,
+            std::vector<bool> &discovered, std::stack<T> &path);
+   std::vector<bool> initialize_discovered(std::vector<bool> &discovered);
 };
 
 template <class T>
@@ -29,53 +36,73 @@ void adj_list<T>::add_node(const T data)
   graph.insert(std::make_pair(data, s));
 }
 
-template <class T>
-void adj_list<T>::dfs(const T node, const T value, bool initialize_flag = true)
+template<class T>
+void adj_list<T>::dfsPath(std::stack<T> &path)
 {
-  //create vector to keep track of discovered nodes
-  static std::vector<bool> V; 
-  static std::stack<T> S;
-
-  if (initialize_flag == true)
-  { 
-    for (auto i : graph)
-      V.push_back(false);
-  }
-  
-  if (S.empty()) S.push(node);
-  else if (S.top() != node) S.push(node); 
-
-  if (node == value)
+  std::cout<<"Route Taken: "<<std::endl;
+  while (!path.empty())
   {
-    std::cout<<"Route Taken: "<<std::endl;
-    while (!S.empty())
-    {
-      T w = S.top();
-      std::cout<<w<<std::endl;
-      S.pop();
-    }
-    V.clear();
+    T w = path.top();
+    std::cout<<w<<std::endl;
+    path.pop();
+  } 
+}
+
+template <class T>
+std::vector<bool> adj_list<T>::initialize_discovered(std::vector<bool> &discovered)
+{
+  for (auto i : graph)
+    discovered.push_back(false);
+
+  return discovered;
+}
+
+template <class T>
+void adj_list<T>::dfs(const T node, const T value)
+{
+  std::vector<bool> discovery;
+  std::stack<T> path;
+    dfs_recursive (node, value, discovery, path);
+  discovery.clear();
+}
+
+template <class T>
+void adj_list<T>::dfs_recursive(const T node, const T value, 
+                      std::vector<bool> &discovered,
+                      std::stack<T> &path)
+{
+
+  if (discovered.empty()) 
+    discovered = initialize_discovered(discovered);
+ 
+  if (path.empty()) path.push(node);
+  else if (path.top() != node) path.push(node); 
+
+  if (node == value) 
+  {
+    dfsPath(path);
     return;
   }
-  //get position of node we are looking at and change the bool vector.
-  auto pos =std::distance(graph.begin(), graph.find(node));
-  V[pos] = true;
-  auto set_it = graph[node].begin();
   
-  while (set_it != graph[node].end())
-  {
-    if (V[(*set_it)-1] == false)
-    {
-       return dfs(*set_it, value, false);
-    }
-   set_it++;
-   if (set_it == graph[node].end())
-   {
-     S.pop();
-     return dfs(S.top(), value, false);
-   }
-  }
+  findNextNode(node, value, path, discovered);
 }
+
+template <class T>
+void adj_list<T>::findNextNode(T node, T value,
+                               std::stack<T> &path,
+                               std::vector<bool> &discovered)
+{
+  discovered[std::distance(graph.begin(), graph.find(node))] = true;
+  auto node_it = graph[node].begin(), node_it_end = graph[node].end();
+
+  while (node_it != node_it_end)
+  {
+    if (!discovered[(*node_it)-1]) return dfs_recursive(*node_it, value, discovered, path);
+    node_it++;
+  }
+  path.pop();
+  return dfs_recursive(path.top(), value, discovered, path);
+} 
 
 template <class T>
 void adj_list<T>::add_edge(const T first, const T second)
