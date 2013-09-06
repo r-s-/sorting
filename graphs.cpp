@@ -21,8 +21,8 @@ class adj_list
    std::map<T, std::set<T>> graph;
 
    //dfs helper functions 
-   void dfsPath(std::stack<T> &path);
-   void findNextNode(T node, T value, std::stack<T> &previousNodes, 
+   void dfs_path(std::stack<T> &path);
+   void find_next_node(T node, T value, std::stack<T> &previousNodes, 
         std::vector<bool> &discovered);
    void dfs_recursive(const T node, const T value,
             std::vector<bool> &discovered, std::stack<T> &path);
@@ -37,7 +37,7 @@ void adj_list<T>::add_node(const T data)
 }
 
 template<class T>
-void adj_list<T>::dfsPath(std::stack<T> &path)
+void adj_list<T>::dfs_path(std::stack<T> &path)
 {
   std::cout<<"Route Taken: "<<std::endl;
   while (!path.empty())
@@ -80,15 +80,15 @@ void adj_list<T>::dfs_recursive(const T node, const T value,
 
   if (node == value) 
   {
-    dfsPath(path);
+    dfs_path(path);
     return;
   }
   
-  findNextNode(node, value, path, discovered);
+  find_next_node(node, value, path, discovered);
 }
 
 template <class T>
-void adj_list<T>::findNextNode(T node, T value,
+void adj_list<T>::find_next_node(T node, T value,
                                std::stack<T> &path,
                                std::vector<bool> &discovered)
 {
