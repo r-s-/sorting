@@ -83,11 +83,10 @@ void adj_list<T>::find_next_node(T node, T value)
 {
   auto node_it = graph[node].begin(), node_it_end = graph[node].end();
 
-  while (node_it != node_it_end)
-  {
-    if (!discovered[(*node_it)-1]) return dfs(*node_it, value);
-    node_it++;
-  }
+  for (;node_it != node_it_end; node_it++)
+    if (!discovered[(*node_it)-1]) 
+      return dfs(*node_it, value);
+  
   path.pop();
   return dfs(path.top(), value);
 } 
