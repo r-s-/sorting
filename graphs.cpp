@@ -20,15 +20,12 @@ class adj_list
   private:
    std::map<T, std::set<T>> graph;
  
-
      std::vector<bool> discovered;
      std::stack<T> path;
-
 
    //dfs helper functions 
    void dfs_path();
    void find_next_node(T node, T value);
-   void dfs_recursive(const T node, const T value);
    void initialize_discovered();
 };
 
@@ -49,6 +46,7 @@ void adj_list<T>::dfs_path()
     std::cout<<w<<std::endl;
     path.pop();
   } 
+  discovered.clear(); //side effect
 }
 
 template <class T>
@@ -60,13 +58,6 @@ void adj_list<T>::initialize_discovered()
 
 template <class T>
 void adj_list<T>::dfs(const T node, const T value)
-{
-    dfs_recursive (node, value);
-  discovered.clear();
-}
-
-template <class T>
-void adj_list<T>::dfs_recursive(const T node, const T value)
 {
   if (discovered.empty()) 
     initialize_discovered();
@@ -94,11 +85,11 @@ void adj_list<T>::find_next_node(T node, T value)
 
   while (node_it != node_it_end)
   {
-    if (!discovered[(*node_it)-1]) return dfs_recursive(*node_it, value);
+    if (!discovered[(*node_it)-1]) return dfs(*node_it, value);
     node_it++;
   }
   path.pop();
-  return dfs_recursive(path.top(), value);
+  return dfs(path.top(), value);
 } 
 
 template <class T>
