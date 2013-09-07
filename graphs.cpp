@@ -19,13 +19,12 @@ class adj_list
     
   private:
    std::map<T, std::set<T>> graph;
- 
-     std::vector<bool> discovered;
-     std::stack<T> path;
+   std::vector<bool> discovered;
+   std::stack<T> path;
 
    //dfs helper functions 
    void dfs_path();
-   void find_next_node(T node, T value);
+   void find_next_node(const T node, const T value);
    void initialize_discovered();
 };
 
@@ -40,13 +39,10 @@ template<class T>
 void adj_list<T>::dfs_path()
 {
   std::cout<<"Route Taken: "<<std::endl;
-  while (!path.empty())
-  {
-    T w = path.top();
-    std::cout<<w<<std::endl;
-    path.pop();
-  } 
-  discovered.clear(); //side effect
+  for (; !path.empty(); path.pop())
+    std::cout<<path.top()<<std::endl;
+  
+  discovered.clear(); 
 }
 
 template <class T>
@@ -62,24 +58,19 @@ void adj_list<T>::dfs(const T node, const T value)
   if (discovered.empty()) 
     initialize_discovered();
  
-  if (path.empty()) 
+  if (path.empty() || path.top()!= node)
     path.push(node);
-  else if (path.top() != node) 
-    path.push(node); 
 
   if (node == value) 
-  {
-    dfs_path();
-    return;
-  }
-  
+    return dfs_path();
+ 
   discovered[std::distance(graph.begin(), graph.find(node))] = true;
  
   find_next_node(node, value);
 }
 
 template <class T>
-void adj_list<T>::find_next_node(T node, T value)
+void adj_list<T>::find_next_node(const T node, const T value)
 {
   auto node_it = graph[node].begin(), node_it_end = graph[node].end();
 
@@ -88,6 +79,11 @@ void adj_list<T>::find_next_node(T node, T value)
       return dfs(*node_it, value);
   
   path.pop();
+  if (path.empty())
+  {
+    std::cout<<"Node Not found"<<std::endl;
+    return;
+  } 
   return dfs(path.top(), value);
 } 
 
@@ -96,11 +92,13 @@ void adj_list<T>::add_edge(const T first, const T second)
 {
   graph[first].insert(second);
 }
+
 template <class T>
 void adj_list<T>::remove_edge(const T first, const T second)
 {
   graph[first].erase(second);
 }
+
 template <class T>
 void adj_list<T>::remove_node(const T data)
 {
@@ -154,6 +152,8 @@ int main()
   example.dfs(5,3);
   example.dfs(2,5);
   example.dfs(4,5);
-
+  //examples of nodes not found:
+  example.dfs(1,9);
+  example.dfs(9,1);
   return 0;
 }
