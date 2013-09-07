@@ -4,10 +4,12 @@
 #include <vector>
 #include <stack>
 #include <queue>
-/* Adjacency list for a (non-directional) graph implimentation */
+
+/* Graph implimentation with basic search functionality 
+   Uses a map of <T, set<T>> to store an adjacency list */
 
 template <class T>
-class adj_list
+class Graph
 {
   public:
    void add_node (const T data);
@@ -22,10 +24,7 @@ class adj_list
    std::map<T, std::set<T>> graph;
    std::vector<bool> discovered;
    std::stack<T> path;
-
    std::queue<T> dfs_order;
-
-   //dfs helper functions 
    void bfs_path();
    void find_next_node_dfs(const T node, const T value);
    void find_next_node_bfs(const T node, const T value);
@@ -33,14 +32,14 @@ class adj_list
 };
 
 template <class T>
-void adj_list<T>::add_node(const T data)
+void Graph<T>::add_node(const T data)
 {
   std::set<T> s;
   graph.insert(std::make_pair(data, s));
 }
 
 template<class T>
-void adj_list<T>::bfs_path()
+void Graph<T>::bfs_path()
 {
   std::cout<<"Route: "<<std::endl;
   for (; !path.empty(); path.pop())
@@ -51,14 +50,14 @@ void adj_list<T>::bfs_path()
 }
 
 template <class T>
-void adj_list<T>::initialize_discovered()
+void Graph<T>::initialize_discovered()
 {
   for (auto i : graph)
     discovered.push_back(false);
 }
 
 template <class T>
-void adj_list<T>::bfs(const T node, const T value)
+void Graph<T>::bfs(const T node, const T value)
 {
   if (discovered.empty()) 
     initialize_discovered();
@@ -72,7 +71,7 @@ void adj_list<T>::bfs(const T node, const T value)
 }
 
 template <class T>
-void adj_list<T>::find_next_node_bfs(const T node, const T value)
+void Graph<T>::find_next_node_bfs(const T node, const T value)
 {
   auto node_it = graph[node].begin(), node_it_end = graph[node].end();
   for (;node_it != node_it_end; node_it++)
@@ -97,7 +96,7 @@ void adj_list<T>::find_next_node_bfs(const T node, const T value)
 }
 
 template <class T>
-void adj_list<T>::dfs(const T node, const T value)
+void Graph<T>::dfs(const T node, const T value)
 {
   if (discovered.empty()) 
     initialize_discovered();
@@ -120,7 +119,7 @@ void adj_list<T>::dfs(const T node, const T value)
 }
 
 template <class T>
-void adj_list<T>::find_next_node_dfs(const T node, const T value)
+void Graph<T>::find_next_node_dfs(const T node, const T value)
 {
   auto node_it = graph[node].begin(), node_it_end = graph[node].end();
 
@@ -139,27 +138,26 @@ void adj_list<T>::find_next_node_dfs(const T node, const T value)
 } 
 
 template <class T>
-void adj_list<T>::add_edge(const T first, const T second)
+void Graph<T>::add_edge(const T first, const T second)
 {
   graph[first].insert(second);
 }
 
 template <class T>
-void adj_list<T>::remove_edge(const T first, const T second)
+void Graph<T>::remove_edge(const T first, const T second)
 {
   graph[first].erase(second);
 }
 
 template <class T>
-void adj_list<T>::remove_node(const T data)
+void Graph<T>::remove_node(const T data)
 {
   graph.erase(data);
 }
 
 template <class T>
-void adj_list<T>:: print_list() const
+void Graph<T>:: print_list() const
 {
-  //print out adjacency list
   for (auto i : graph)
   {
     std::cout<<i.first<<" ";
@@ -173,7 +171,7 @@ void adj_list<T>:: print_list() const
 }
 int main()
 {
-  adj_list<int> example; 
+  Graph<int> example; 
   
   for (int i = 1; i<=6; i++)
    example.add_node(i);
