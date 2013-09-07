@@ -26,8 +26,9 @@ class adj_list
    std::queue<T> dfs_order;
 
    //dfs helper functions 
-   void dfs_path();
-   void find_next_node(const T node, const T value);
+   void bfs_path();
+   void find_next_node_dfs(const T node, const T value);
+   void find_next_node_bfs(const T node, const T value);
    void initialize_discovered();
 };
 
@@ -39,11 +40,12 @@ void adj_list<T>::add_node(const T data)
 }
 
 template<class T>
-void adj_list<T>::dfs_path()
+void adj_list<T>::bfs_path()
 {
-  std::cout<<"Route Taken: "<<std::endl;
+  std::cout<<"Route: "<<std::endl;
   for (; !path.empty(); path.pop())
-    std::cout<<path.top()<<std::endl;
+    std::cout<<path.top()<<" ";
+  std::cout<<std::endl;
   
   discovered.clear(); 
 }
@@ -58,20 +60,20 @@ void adj_list<T>::initialize_discovered()
 template <class T>
 void adj_list<T>::bfs(const T node, const T value)
 {
-  
   if (discovered.empty()) 
-  {
     initialize_discovered();
-    discovered[std::distance(graph.begin(), graph.find(node))] = true;
-    if (node == value){std::cout<<"same"<<std::endl; return;}
-  }
- 
+
   if (graph.find(node) == graph.end()) 
   {
-    std::cout<<"NODE NOT IN GRAPH"<<std::endl; 
+    std::cout<<"Node not found (BFS)"<<std::endl; 
     return;
   }
+  find_next_node_bfs(node, value); 
+}
 
+template <class T>
+void adj_list<T>::find_next_node_bfs(const T node, const T value)
+{
   auto node_it = graph[node].begin(), node_it_end = graph[node].end();
   for (;node_it != node_it_end; node_it++)
     if (!discovered[(*node_it)-1]) 
@@ -79,14 +81,18 @@ void adj_list<T>::bfs(const T node, const T value)
       dfs_order.push(*node_it); 
       discovered[(*node_it)-1] = true;
       if (*node_it == value) 
-      { std::cout<<"found it"<<std::endl; 
+      { 
+        std::cout<<"Found node"<<std::endl; 
         while (!dfs_order.empty()) dfs_order.pop(); 
         discovered.clear();
-       return;}
-    } 
+       return;
+      }
+    }
+ 
   T tmp = dfs_order.front();
   dfs_order.pop();
   if (dfs_order.empty()){std::cout<<"Node Not Found (BFS)"<<std::endl; return;}
+  
   bfs(tmp, value);
 }
 
@@ -100,21 +106,21 @@ void adj_list<T>::dfs(const T node, const T value)
     path.push(node);
 
   if (node == value) 
-    return dfs_path();
+    return bfs_path();
   
   if (graph.find(node) == graph.end()) 
   {
-    std::cout<<"NODE NOT IN GRAPH"<<std::endl; 
+    std::cout<<"Node not found (DFS)"<<std::endl; 
     return;
   }
  
   discovered[std::distance(graph.begin(), graph.find(node))] = true;
    
-  find_next_node(node, value);
+  find_next_node_dfs(node, value);
 }
 
 template <class T>
-void adj_list<T>::find_next_node(const T node, const T value)
+void adj_list<T>::find_next_node_dfs(const T node, const T value)
 {
   auto node_it = graph[node].begin(), node_it_end = graph[node].end();
 
@@ -125,7 +131,7 @@ void adj_list<T>::find_next_node(const T node, const T value)
   path.pop();
   if (path.empty())
   {
-    std::cout<<"Node Not found"<<std::endl;
+    std::cout<<"Node Not found (DFS)"<<std::endl;
     discovered.clear();
     return;
   } 
