@@ -3,6 +3,7 @@
 #include <set>
 #include <vector>
 #include <stack>
+#include <queue>
 /* Adjacency list for a (non-directional) graph implimentation */
 
 template <class T>
@@ -14,13 +15,15 @@ class adj_list
    void remove_node (const T data); 
    void remove_edge(const T first, const T second);
    void dfs(const T node, const T value);
-   void bfs();
+   void bfs(const T node, const T value);
    void print_list() const;
     
   private:
    std::map<T, std::set<T>> graph;
    std::vector<bool> discovered;
    std::stack<T> path;
+
+   std::queue<T> dfs_order;
 
    //dfs helper functions 
    void dfs_path();
@@ -53,6 +56,41 @@ void adj_list<T>::initialize_discovered()
 }
 
 template <class T>
+void adj_list<T>::bfs(const T node, const T value)
+{
+  
+  if (discovered.empty()) 
+  {
+    initialize_discovered();
+    discovered[std::distance(graph.begin(), graph.find(node))] = true;
+    if (node == value){std::cout<<"same"<<std::endl; return;}
+  }
+ 
+  if (graph.find(node) == graph.end()) 
+  {
+    std::cout<<"NODE NOT IN GRAPH"<<std::endl; 
+    return;
+  }
+
+  auto node_it = graph[node].begin(), node_it_end = graph[node].end();
+  for (;node_it != node_it_end; node_it++)
+    if (!discovered[(*node_it)-1]) 
+    {
+      dfs_order.push(*node_it); 
+      discovered[(*node_it)-1] = true;
+      if (*node_it == value) 
+      { std::cout<<"found it"<<std::endl; 
+        while (!dfs_order.empty()) dfs_order.pop(); 
+        discovered.clear();
+       return;}
+    } 
+  T tmp = dfs_order.front();
+  dfs_order.pop();
+  if (dfs_order.empty()){std::cout<<"Node Not Found (BFS)"<<std::endl; return;}
+  bfs(tmp, value);
+}
+
+template <class T>
 void adj_list<T>::dfs(const T node, const T value)
 {
   if (discovered.empty()) 
@@ -63,9 +101,15 @@ void adj_list<T>::dfs(const T node, const T value)
 
   if (node == value) 
     return dfs_path();
+  
+  if (graph.find(node) == graph.end()) 
+  {
+    std::cout<<"NODE NOT IN GRAPH"<<std::endl; 
+    return;
+  }
  
   discovered[std::distance(graph.begin(), graph.find(node))] = true;
- 
+   
   find_next_node(node, value);
 }
 
@@ -82,6 +126,7 @@ void adj_list<T>::find_next_node(const T node, const T value)
   if (path.empty())
   {
     std::cout<<"Node Not found"<<std::endl;
+    discovered.clear();
     return;
   } 
   return dfs(path.top(), value);
@@ -155,5 +200,14 @@ int main()
   //examples of nodes not found:
   example.dfs(1,9);
   example.dfs(9,1);
+  
+
+  example.bfs(1,5);
+  example.bfs(1,4);
+  example.bfs(2,1);
+  example.bfs(2,4);
+  
+  example.bfs(1,9);
+  example.bfs(9,1); 
   return 0;
 }
